@@ -39,7 +39,7 @@ AI-powered career development platform helping professionals build resumes, prep
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/nexoai.git
+   git clone https://github.com/theshibaprasad/NexoAI.git
    cd nexoai
    ```
 
