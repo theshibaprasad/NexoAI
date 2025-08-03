@@ -40,7 +40,7 @@ AI-powered career development platform helping professionals build resumes, prep
 
    ```bash
    git clone https://github.com/theshibaprasad/NexoAI.git
-   cd nexoai
+   cd NexoAI
    ```
 
 2. **Install dependencies**
