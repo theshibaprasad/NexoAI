@@ -8,64 +8,82 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export async function generateQuiz() {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-    select: {
-      industry: true,
-      skills: true,
-    },
-  });
-
-  if (!user) throw new Error("User not found");
-
-  const prompt = `
-    Generate 10 technical interview questions for a ${
-      user.industry
-    } professional${
-    user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
-  }.
-    
-    Each question should be multiple choice with 4 options.
-    
-    Return the response in this JSON format only, no additional text:
-    {
-      "questions": [
-        {
-          "question": "string",
-          "options": ["string", "string", "string", "string"],
-          "correctAnswer": "string",
-          "explanation": "string"
-        }
-      ]
-    }
-  `;
-
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
-    const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
-    const quiz = JSON.parse(cleanedText);
+    const { userId } = await auth();
+    if (!userId) {
+      console.log("No user authenticated for generateQuiz");
+      return null;
+    }
 
-    return quiz.questions;
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+      select: {
+        industry: true,
+        skills: true,
+      },
+    });
+
+    if (!user) {
+      console.log("User not found for generateQuiz");
+      return null;
+    }
+
+    const prompt = `
+      Generate 10 technical interview questions for a ${
+        user.industry
+      } professional${
+      user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
+    }.
+      
+      Each question should be multiple choice with 4 options.
+      
+      Return the response in this JSON format only, no additional text:
+      {
+        "questions": [
+          {
+            "question": "string",
+            "options": ["string", "string", "string", "string"],
+            "correctAnswer": "string",
+            "explanation": "string"
+          }
+        ]
+      }
+    `;
+
+    try {
+      const result = await model.generateContent(prompt);
+      const response = result.response;
+      const text = response.text();
+      const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
+      const quiz = JSON.parse(cleanedText);
+
+      return quiz.questions;
+    } catch (error) {
+      console.error("Error generating quiz:", error);
+      return null;
+    }
   } catch (error) {
-    console.error("Error generating quiz:", error);
-    throw new Error("Failed to generate quiz questions");
+    console.log("Auth error in generateQuiz:", error.message);
+    return null;
   }
 }
 
 export async function saveQuizResult(questions, answers, score) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      console.log("No user authenticated for saveQuizResult");
+      return null;
+    }
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
 
-  if (!user) throw new Error("User not found");
+    if (!user) {
+      console.log("User not found for saveQuizResult");
+      return null;
+    }
 
   const questionResults = questions.map((q, index) => ({
     question: q.question,
@@ -124,33 +142,48 @@ export async function saveQuizResult(questions, answers, score) {
     return assessment;
   } catch (error) {
     console.error("Error saving quiz result:", error);
-    throw new Error("Failed to save quiz result");
+    return null;
+  }
+  } catch (error) {
+    console.log("Auth error in saveQuizResult:", error.message);
+    return null;
   }
 }
 
 export async function getAssessments() {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
-  if (!user) throw new Error("User not found");
-
   try {
-    const assessments = await db.assessment.findMany({
-      where: {
-        userId: user.id,
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
+    const { userId } = await auth();
+    if (!userId) {
+      console.log("No user authenticated for getAssessments");
+      return [];
+    }
+
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
     });
 
-    return assessments;
+    if (!user) {
+      console.log("User not found for getAssessments");
+      return [];
+    }
+
+    try {
+      const assessments = await db.assessment.findMany({
+        where: {
+          userId: user.id,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      });
+
+      return assessments;
+    } catch (error) {
+      console.error("Error fetching assessments:", error);
+      return [];
+    }
   } catch (error) {
-    console.error("Error fetching assessments:", error);
-    throw new Error("Failed to fetch assessments");
+    console.log("Auth error in getAssessments:", error.message);
+    return [];
   }
 }

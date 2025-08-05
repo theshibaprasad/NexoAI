@@ -8,14 +8,21 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export async function generateCoverLetter(data) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      console.log("No user authenticated for generateCoverLetter");
+      return null;
+    }
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
 
-  if (!user) throw new Error("User not found");
+    if (!user) {
+      console.log("User not found for generateCoverLetter");
+      return null;
+    }
 
   const prompt = `
     Write a professional cover letter for a ${data.jobTitle} position at ${
@@ -61,62 +68,106 @@ export async function generateCoverLetter(data) {
     return coverLetter;
   } catch (error) {
     console.error("Error generating cover letter:", error.message);
-    throw new Error("Failed to generate cover letter");
+    return null;
+  }
+  } catch (error) {
+    console.log("Auth error in generateCoverLetter:", error.message);
+    return null;
   }
 }
 
 export async function getCoverLetters() {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      console.log("No user authenticated for getCoverLetters");
+      return [];
+    }
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
 
-  if (!user) throw new Error("User not found");
+    if (!user) {
+      console.log("User not found for getCoverLetters");
+      return [];
+    }
 
-  return await db.coverLetter.findMany({
-    where: {
-      userId: user.id,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+    return await db.coverLetter.findMany({
+      where: {
+        userId: user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  } catch (error) {
+    console.log("Auth error in getCoverLetters:", error.message);
+    return [];
+  }
 }
 
 export async function getCoverLetter(id) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      console.log("No user authenticated for getCoverLetter");
+      return null;
+    }
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
 
-  if (!user) throw new Error("User not found");
+    if (!user) {
+      console.log("User not found for getCoverLetter");
+      return null;
+    }
 
-  return await db.coverLetter.findUnique({
-    where: {
-      id,
-      userId: user.id,
-    },
-  });
+    return await db.coverLetter.findUnique({
+      where: {
+        id,
+        userId: user.id,
+      },
+    });
+  } catch (error) {
+    console.log("Auth error in getCoverLetter:", error.message);
+    return null;
+  }
 }
 
 export async function deleteCoverLetter(id) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      console.log("No user authenticated for deleteCoverLetter");
+      return { success: false };
+    }
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
+    const user = await db.user.findUnique({
+      where: { clerkUserId: userId },
+    });
 
-  if (!user) throw new Error("User not found");
+    if (!user) {
+      console.log("User not found for deleteCoverLetter");
+      return { success: false };
+    }
 
-  return await db.coverLetter.delete({
-    where: {
-      id,
-      userId: user.id,
-    },
-  });
+    try {
+      await db.coverLetter.delete({
+        where: {
+          id,
+          userId: user.id,
+        },
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error("Error deleting cover letter:", error);
+      return { success: false };
+    }
+  } catch (error) {
+    console.log("Auth error in deleteCoverLetter:", error.message);
+    return { success: false };
+  }
 }

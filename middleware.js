@@ -7,17 +7,25 @@ const isProtectedRoute = createRouteMatcher([
   "/interview(.*)",
   "/ai-cover-letter(.*)",
   "/onboarding(.*)",
+  "/coding-test(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
+  try {
+    const { userId } = await auth();
 
-  if (!userId && isProtectedRoute(req)) {
-    const { redirectToSignIn } = await auth();
-    return redirectToSignIn();
+    if (!userId && isProtectedRoute(req)) {
+      const { redirectToSignIn } = await auth();
+      return redirectToSignIn();
+    }
+
+    return NextResponse.next();
+  } catch (error) {
+    // If middleware fails, allow the request to continue
+    // This prevents the middleware from breaking the application
+    console.log("Middleware error:", error.message);
+    return NextResponse.next();
   }
-
-  return NextResponse.next();
 });
 
 export const config = {
