@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, XCircle, AlertCircle, Clock } from "lucide-react";
+import { CheckCircle, XCircle, AlertCircle, Clock, Timer, Zap, TrendingUp, BarChart3 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const TestCases = ({ results }) => {
@@ -31,43 +31,50 @@ const TestCases = ({ results }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Summary */}
-      <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg border-0">
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3">
             {results.success ? (
-              <CheckCircle className="w-5 h-5 text-green-500" />
+              <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+              </div>
             ) : (
-              <XCircle className="w-5 h-5 text-red-500" />
+              <div className="p-2 bg-red-100 dark:bg-red-900/20 rounded-lg">
+                <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+              </div>
             )}
-            <span className="font-semibold text-gray-900 dark:text-white">
-              {results.success ? "All Tests Passed" : "Some Tests Failed"}
-            </span>
+            <div>
+              <span className="font-semibold text-gray-900 dark:text-white text-lg">
+                {results.success ? "All Tests Passed" : "Some Tests Failed"}
+              </span>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {results.passedTests} / {results.totalTests} tests passed
+              </div>
+            </div>
           </div>
         </div>
-        <div className="text-sm text-gray-600 dark:text-gray-400">
-          {results.passedTests} / {results.totalTests} tests passed
-        </div>
+        {results.executionTime && (
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <Timer className="w-4 h-4" />
+            {results.executionTime}ms
+          </div>
+        )}
       </div>
-
-      {/* Execution Time */}
-      {results.executionTime && (
-        <div className="text-sm text-gray-600 dark:text-gray-400">
-          Execution time: {results.executionTime}ms
-        </div>
-      )}
 
       {/* Error Message */}
       {results.error && (
         <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <div className="flex items-start space-x-2">
-            <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
-            <div>
-              <h4 className="font-semibold text-red-800 dark:text-red-200 mb-1">
+          <div className="flex items-start space-x-3">
+            <div className="p-1 bg-red-100 dark:bg-red-900/20 rounded">
+              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-semibold text-red-800 dark:text-red-200 mb-2">
                 Compilation Error
               </h4>
-              <pre className="text-sm text-red-700 dark:text-red-300 whitespace-pre-wrap font-mono">
+              <pre className="text-sm text-red-700 dark:text-red-300 whitespace-pre-wrap font-mono bg-red-100 dark:bg-red-900/20 p-3 rounded">
                 {results.error}
               </pre>
             </div>
@@ -76,14 +83,17 @@ const TestCases = ({ results }) => {
       )}
 
       {/* Test Cases */}
-      <div className="space-y-3">
-        <h4 className="font-semibold text-gray-900 dark:text-white">
-          Test Cases
-        </h4>
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h4 className="font-semibold text-gray-900 dark:text-white">
+            Test Cases
+          </h4>
+        </div>
         {results.testCases?.map((testCase, index) => (
           <div
             key={index}
-            className={`p-4 rounded-lg border ${
+            className={`p-4 rounded-lg border-0 shadow-sm ${
               testCase.status === "passed"
                 ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
                 : testCase.status === "failed"
@@ -91,42 +101,54 @@ const TestCases = ({ results }) => {
                 : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
             }`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-2">
-                {getStatusIcon(testCase.status)}
-                <span className="font-medium text-gray-900 dark:text-white">
-                  Test Case {index + 1}
-                </span>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className={`p-1 rounded ${
+                  testCase.status === "passed" ? "bg-green-100 dark:bg-green-900/20" :
+                  testCase.status === "failed" ? "bg-red-100 dark:bg-red-900/20" :
+                  "bg-gray-100 dark:bg-gray-900/20"
+                }`}>
+                  {getStatusIcon(testCase.status)}
+                </div>
+                <div>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    Test Case {index + 1}
+                  </span>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    {testCase.status === "passed" ? "✓ Passed" : 
+                     testCase.status === "failed" ? "✗ Failed" : "⏳ Pending"}
+                  </div>
+                </div>
               </div>
-              <Badge className={getStatusColor(testCase.status)}>
+              <Badge className={`${getStatusColor(testCase.status)} text-xs`}>
                 {testCase.status}
               </Badge>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">
-                  Input:
+                <span className="font-semibold text-gray-700 dark:text-gray-300 text-xs uppercase tracking-wide">
+                  Input
                 </span>
-                <div className="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded font-mono">
+                <div className="mt-2 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg font-mono text-sm">
                   {testCase.input}
                 </div>
               </div>
 
               <div>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">
-                  Expected:
+                <span className="font-semibold text-gray-700 dark:text-gray-300 text-xs uppercase tracking-wide">
+                  Expected
                 </span>
-                <div className="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded font-mono">
+                <div className="mt-2 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg font-mono text-sm">
                   {testCase.expected}
                 </div>
               </div>
 
               <div>
-                <span className="font-semibold text-gray-700 dark:text-gray-300">
-                  Output:
+                <span className="font-semibold text-gray-700 dark:text-gray-300 text-xs uppercase tracking-wide">
+                  Output
                 </span>
-                <div className="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded font-mono">
+                <div className="mt-2 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg font-mono text-sm">
                   {testCase.output || "N/A"}
                 </div>
               </div>
@@ -134,8 +156,8 @@ const TestCases = ({ results }) => {
 
             {/* Explanation */}
             {testCase.explanation && (
-              <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                <div className="text-xs text-gray-600 dark:text-gray-400">
+              <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
                   <span className="font-semibold">Explanation: </span>
                   {testCase.explanation}
                 </div>
@@ -143,7 +165,7 @@ const TestCases = ({ results }) => {
             )}
 
             {testCase.error && (
-              <div className="mt-3 p-3 bg-red-100 dark:bg-red-900/20 rounded">
+              <div className="mt-4 p-3 bg-red-100 dark:bg-red-900/20 rounded-lg">
                 <div className="text-sm text-red-700 dark:text-red-300 font-mono">
                   {testCase.error}
                 </div>
@@ -156,10 +178,13 @@ const TestCases = ({ results }) => {
       {/* Code Analysis */}
       {results.analysis && (
         <div className="p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-          <h4 className="font-semibold text-purple-800 dark:text-purple-200 mb-2">
-            Code Analysis
-          </h4>
-          <div className="text-sm text-purple-700 dark:text-purple-300">
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <h4 className="font-semibold text-purple-800 dark:text-purple-200">
+              Code Analysis
+            </h4>
+          </div>
+          <div className="text-sm text-purple-700 dark:text-purple-300 leading-relaxed">
             {results.analysis}
           </div>
         </div>
@@ -168,10 +193,13 @@ const TestCases = ({ results }) => {
       {/* Suggestions */}
       {results.suggestions && (
         <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-          <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2">
-            Improvement Suggestions
-          </h4>
-          <div className="text-sm text-green-700 dark:text-green-300">
+          <div className="flex items-center gap-2 mb-3">
+            <Zap className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <h4 className="font-semibold text-green-800 dark:text-green-200">
+              Improvement Suggestions
+            </h4>
+          </div>
+          <div className="text-sm text-green-700 dark:text-green-300 leading-relaxed">
             {results.suggestions}
           </div>
         </div>
@@ -180,18 +208,25 @@ const TestCases = ({ results }) => {
       {/* Performance Metrics */}
       {results.memoryUsage && (
         <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">
-            Performance Metrics
-          </h4>
+          <div className="flex items-center gap-2 mb-3">
+            <BarChart3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <h4 className="font-semibold text-blue-800 dark:text-blue-200">
+              Performance Metrics
+            </h4>
+          </div>
           <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
+            <div className="flex items-center gap-2">
               <span className="text-blue-700 dark:text-blue-300">Memory Usage:</span>
-              <span className="ml-2 font-mono">{results.memoryUsage}</span>
+              <span className="font-mono bg-blue-100 dark:bg-blue-900/20 px-2 py-1 rounded">
+                {results.memoryUsage}
+              </span>
             </div>
             {results.executionTime && (
-              <div>
+              <div className="flex items-center gap-2">
                 <span className="text-blue-700 dark:text-blue-300">Execution Time:</span>
-                <span className="ml-2 font-mono">{results.executionTime}ms</span>
+                <span className="font-mono bg-blue-100 dark:bg-blue-900/20 px-2 py-1 rounded">
+                  {results.executionTime}ms
+                </span>
               </div>
             )}
           </div>
