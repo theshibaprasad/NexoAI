@@ -121,3 +121,16 @@ body {
   height: 100%;
   background: radial-gradient(circle, transparent, rgba(59, 130, 246, 0.05));
 }
+
+body.loading > *:not(.first-visit-loader-portal) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+body.loading #__next {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+body.loading .first-visit-loader-portal {
+  opacity: 1 !important;
+  pointer-events: all !important;
+}

@@ -43,6 +43,7 @@ export async function getIndustryInsights() {
       // Return default insights if no user is authenticated
       return {
         industry: "Technology",
+        lastUpdated: new Date().toISOString(),
         salaryRanges: [
           { role: "Software Engineer", min: 80000, max: 150000, median: 115000, location: "Remote" },
           { role: "Data Scientist", min: 90000, max: 160000, median: 125000, location: "Remote" },
@@ -77,6 +78,7 @@ export async function getIndustryInsights() {
       const industryInsight = await db.industryInsight.create({
         data: {
           industry: user.industry,
+          lastUpdated: new Date(),
           ...insights,
           nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         },
@@ -90,6 +92,7 @@ export async function getIndustryInsights() {
     // Return default insights if authentication fails
     return {
       industry: "Technology",
+      lastUpdated: new Date().toISOString(),
       salaryRanges: [
         { role: "Software Engineer", min: 80000, max: 150000, median: 115000, location: "Remote" },
         { role: "Data Scientist", min: 90000, max: 160000, median: 125000, location: "Remote" },

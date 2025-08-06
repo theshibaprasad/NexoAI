@@ -40,13 +40,13 @@ const DashboardView = ({ insights }) => {
   const getDemandLevelColor = (level) => {
     switch (level.toLowerCase()) {
       case "high":
-        return "bg-green-500";
+        return "bg-blue-700";
       case "medium":
-        return "bg-yellow-500";
+        return "bg-blue-400";
       case "low":
-        return "bg-red-500";
+        return "bg-blue-200";
       default:
-        return "bg-gray-500";
+        return "bg-blue-300";
     }
   };
 
@@ -66,12 +66,33 @@ const DashboardView = ({ insights }) => {
   const OutlookIcon = getMarketOutlookInfo(insights.marketOutlook).icon;
   const outlookColor = getMarketOutlookInfo(insights.marketOutlook).color;
 
-  // Format dates using date-fns
-  const lastUpdatedDate = format(new Date(insights.lastUpdated), "dd/MM/yyyy");
-  const nextUpdateDistance = formatDistanceToNow(
-    new Date(insights.nextUpdate),
-    { addSuffix: true }
-  );
+  // Format dates using date-fns with proper validation
+  const formatDateSafely = (dateString, formatStr) => {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return "N/A";
+      }
+      return format(date, formatStr);
+    } catch (error) {
+      return "N/A";
+    }
+  };
+
+  const formatDistanceSafely = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return "N/A";
+      }
+      return formatDistanceToNow(date, { addSuffix: true });
+    } catch (error) {
+      return "N/A";
+    }
+  };
+
+  const lastUpdatedDate = formatDateSafely(insights.lastUpdated, "dd/MM/yyyy");
+  const nextUpdateDistance = formatDistanceSafely(insights.nextUpdate);
 
   return (
     <div className="space-y-6">
@@ -175,9 +196,9 @@ const DashboardView = ({ insights }) => {
                     return null;
                   }}
                 />
-                <Bar dataKey="min" fill="#94a3b8" name="Min Salary (K)" />
-                <Bar dataKey="median" fill="#64748b" name="Median Salary (K)" />
-                <Bar dataKey="max" fill="#475569" name="Max Salary (K)" />
+                <Bar dataKey="min" fill="#60a5fa" name="Min Salary (K)" />
+                <Bar dataKey="median" fill="#2563eb" name="Median Salary (K)" />
+                <Bar dataKey="max" fill="#1e3a8a" name="Max Salary (K)" />
               </BarChart>
             </ResponsiveContainer>
           </div>
