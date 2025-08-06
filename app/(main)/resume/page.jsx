@@ -1,5 +1,7 @@
 import { getResume } from "@/actions/resume";
-import ResumeBuilder from "./_components/resume-builder";
+import dynamic from "next/dynamic";
+
+const ResumeBuilder = dynamic(() => import("./_components/resume-builder"), { ssr: false });
 
 export default async function ResumePage() {
   const resume = await getResume();

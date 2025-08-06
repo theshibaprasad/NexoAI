@@ -12,7 +12,6 @@ export async function saveResume(content) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      console.log("No user authenticated for saveResume");
       return null;
     }
 
@@ -21,7 +20,6 @@ export async function saveResume(content) {
     });
 
     if (!user) {
-      console.log("User not found for saveResume");
       return null;
     }
 

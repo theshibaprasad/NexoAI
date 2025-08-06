@@ -11,7 +11,6 @@ export async function generateCoverLetter(data) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      console.log("No user authenticated for generateCoverLetter");
       return null;
     }
 
@@ -20,7 +19,6 @@ export async function generateCoverLetter(data) {
     });
 
     if (!user) {
-      console.log("User not found for generateCoverLetter");
       return null;
     }
 
@@ -71,7 +69,6 @@ export async function generateCoverLetter(data) {
     return null;
   }
   } catch (error) {
-    console.log("Auth error in generateCoverLetter:", error.message);
     return null;
   }
 }
@@ -80,7 +77,6 @@ export async function getCoverLetters() {
   try {
     const { userId } = await auth();
     if (!userId) {
-      console.log("No user authenticated for getCoverLetters");
       return [];
     }
 
@@ -89,7 +85,6 @@ export async function getCoverLetters() {
     });
 
     if (!user) {
-      console.log("User not found for getCoverLetters");
       return [];
     }
 
@@ -102,7 +97,6 @@ export async function getCoverLetters() {
       },
     });
   } catch (error) {
-    console.log("Auth error in getCoverLetters:", error.message);
     return [];
   }
 }
@@ -111,7 +105,6 @@ export async function getCoverLetter(id) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      console.log("No user authenticated for getCoverLetter");
       return null;
     }
 
@@ -120,7 +113,6 @@ export async function getCoverLetter(id) {
     });
 
     if (!user) {
-      console.log("User not found for getCoverLetter");
       return null;
     }
 
@@ -131,7 +123,6 @@ export async function getCoverLetter(id) {
       },
     });
   } catch (error) {
-    console.log("Auth error in getCoverLetter:", error.message);
     return null;
   }
 }
@@ -140,7 +131,6 @@ export async function deleteCoverLetter(id) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      console.log("No user authenticated for deleteCoverLetter");
       return { success: false };
     }
 
@@ -149,7 +139,6 @@ export async function deleteCoverLetter(id) {
     });
 
     if (!user) {
-      console.log("User not found for deleteCoverLetter");
       return { success: false };
     }
 
@@ -167,7 +156,6 @@ export async function deleteCoverLetter(id) {
       return { success: false };
     }
   } catch (error) {
-    console.log("Auth error in deleteCoverLetter:", error.message);
     return { success: false };
   }
 }

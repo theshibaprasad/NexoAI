@@ -11,7 +11,6 @@ export async function generateQuiz() {
   try {
     const { userId } = await auth();
     if (!userId) {
-      console.log("No user authenticated for generateQuiz");
       return null;
     }
 
@@ -24,7 +23,6 @@ export async function generateQuiz() {
     });
 
     if (!user) {
-      console.log("User not found for generateQuiz");
       return null;
     }
 
@@ -72,7 +70,6 @@ export async function saveQuizResult(questions, answers, score) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      console.log("No user authenticated for saveQuizResult");
       return null;
     }
 
@@ -81,7 +78,6 @@ export async function saveQuizResult(questions, answers, score) {
     });
 
     if (!user) {
-      console.log("User not found for saveQuizResult");
       return null;
     }
 
@@ -121,7 +117,6 @@ export async function saveQuizResult(questions, answers, score) {
       const tipResult = await model.generateContent(improvementPrompt);
 
       improvementTip = tipResult.response.text().trim();
-      console.log(improvementTip);
     } catch (error) {
       console.error("Error generating improvement tip:", error);
       // Continue without improvement tip if generation fails
@@ -154,7 +149,6 @@ export async function getAssessments() {
   try {
     const { userId } = await auth();
     if (!userId) {
-      console.log("No user authenticated for getAssessments");
       return [];
     }
 
@@ -163,7 +157,6 @@ export async function getAssessments() {
     });
 
     if (!user) {
-      console.log("User not found for getAssessments");
       return [];
     }
 

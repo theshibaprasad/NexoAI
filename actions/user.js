@@ -62,7 +62,6 @@ export async function updateUser(data) {
     revalidatePath("/");
     return result.user;
   } catch (error) {
-    console.error("Error updating user and industry:", error.message);
     throw new Error("Failed to update profile");
   }
 }
@@ -96,11 +95,9 @@ export async function getUserOnboardingStatus() {
         isOnboarded: !!user?.industry,
       };
     } catch (error) {
-      console.error("Error checking onboarding status:", error);
       return { isOnboarded: false };
     }
   } catch (error) {
-    console.log("Auth error in getUserOnboardingStatus:", error.message);
     return { isOnboarded: false };
   }
 }

@@ -87,7 +87,6 @@ export async function getIndustryInsights() {
 
     return user.industryInsight;
   } catch (error) {
-    console.log("Auth error in getIndustryInsights:", error.message);
     // Return default insights if authentication fails
     return {
       industry: "Technology",
